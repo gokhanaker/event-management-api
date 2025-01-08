@@ -1,6 +1,6 @@
 import Event, { IEvent } from "../models/Event";
 
-export const createNewEvent = async (
+export const createNewEventService = async (
   title: string,
   description: string,
   date: Date,
@@ -23,7 +23,7 @@ export const createNewEvent = async (
   return event;
 };
 
-export const getFilteredEvents = async (
+export const getFilteredEventsService = async (
   category: string | undefined,
   location: string | undefined,
   title: string | undefined
@@ -33,16 +33,17 @@ export const getFilteredEvents = async (
   if (location) filters.location = { $regex: location, $options: "i" }; // i for case-insensitive
   if (title) filters.title = { $regex: title, $options: "i" };
 
-  const events = await Event.find(filters);
-  return events;
+  return await Event.find(filters);
 };
 
-export const getEventById = async (id: string): Promise<IEvent | null> => {
+export const getEventByIdService = async (
+  id: string
+): Promise<IEvent | null> => {
   const event = await Event.findById(id);
   return event;
 };
 
-export const updateEventById = async (
+export const updateEventByIdService = async (
   id: string,
   event: IEvent
 ): Promise<IEvent | null> => {
@@ -50,7 +51,9 @@ export const updateEventById = async (
   return updatedEvent;
 };
 
-export const deleteEventById = async (id: string): Promise<IEvent | null> => {
+export const deleteEventByIdService = async (
+  id: string
+): Promise<IEvent | null> => {
   const event = await Event.findByIdAndDelete(id);
   return event;
 };

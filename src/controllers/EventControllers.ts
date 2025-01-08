@@ -4,11 +4,11 @@ import {
   filterEventsSchema,
 } from "../validation/EventValidation";
 import {
-  getEventById,
-  createNewEvent,
-  getFilteredEvents,
-  deleteEventById,
-  updateEventById,
+  getEventByIdService,
+  createNewEventService,
+  getFilteredEventsService,
+  deleteEventByIdService,
+  updateEventByIdService,
 } from "../service/EventService";
 
 export const createEvent = async (
@@ -27,7 +27,7 @@ export const createEvent = async (
     const { title, description, date, time, location, category, maxAttendees } =
       req.body;
 
-    const event = await createNewEvent(
+    const event = await createNewEventService(
       title,
       description,
       date,
@@ -53,7 +53,7 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
 
     const { category, location, title } = req.query;
 
-    const filteredEvents = await getFilteredEvents(
+    const filteredEvents = await getFilteredEventsService(
       category as string,
       location as string,
       title as string
@@ -69,7 +69,7 @@ export const getEvent = async (req: Request, res: Response) => {
     const { id } = req.params;
     if (!id) return res.status(400).json({ error: "Event id is required" });
 
-    const event = await getEventById(id as string);
+    const event = await getEventByIdService(id as string);
 
     if (!event) {
       res.status(404).json({ error: "Event not found" });
@@ -92,7 +92,7 @@ export const updateEvent = async (req: Request, res: Response) => {
 
     if (error) res.status(400).json({ error: "Invalid event format" });
 
-    const event = await updateEventById(id as string, req.body);
+    const event = await updateEventByIdService(id as string, req.body);
     return res.status(200).json(event);
   } catch (error) {
     res.status(500).json({ error: "Failed to update event" });
@@ -105,7 +105,7 @@ export const deleteEvent = async (req: Request, res: Response) => {
 
     if (!id) return res.status(400).json({ error: "Event id is required" });
 
-    const event = await deleteEventById(id as string);
+    const event = await deleteEventByIdService(id as string);
     return res.status(200).json(event);
   } catch (error) {
     res.status(500).json({ error: "Failed to delete event" });

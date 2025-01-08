@@ -2,15 +2,16 @@ import { Request, Response } from "express";
 import { registerUserSchema } from "../validation/UserValidation";
 import User from "../models/User";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import {
+  generateTokenService,
+  registerUserService,
+} from "../service/AuthService";
 
 export const registerUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    console.log("request came with:", req.body);
-
     const { error } = registerUserSchema.validate(req.body, {
       abortEarly: false,
     });
@@ -29,15 +30,7 @@ export const registerUser = async (
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({
-      username,
-      email,
-      password: hashedPassword,
-      role: role || "user",
-    });
-
-    await user.save();
+    await registerUserService(password, username, email, role);
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to register user" });
@@ -64,14 +57,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       res.status(401).json({ error: "Invalid password" });
     }
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
-    );
-
-    console.log("generated token ", token);
-
+    const token = await generateTokenService(user._id, user.role);
     res.status(200).json({ token, message: "Login successful" });
   } catch (error) {
     res.status(500).json({ error: "Failed to login user" });
