@@ -16,6 +16,10 @@ export const createEvent = async (
   res: Response
 ): Promise<void> => {
   console.log("request came with body: ", req.body);
+  console.log("request came with header: ", req.header);
+
+  const userId = req.headers["user-id"]; // Access the user ID from headers
+  const userRole = req.headers["user-role"]; // Access the user role from headers
 
   try {
     const { error } = createEventSchema.validate(req.body, {
