@@ -1,12 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// TODO later add organizer field to the schema and maybe attendees array as well
 export interface IEvent extends Document {
   title: string;
   description: string;
   date: Date;
-  time: string;
   location: string;
+  organizer: mongoose.Types.ObjectId;
   category:
     | "Technology"
     | "Sport"
@@ -21,14 +20,18 @@ const EventSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   date: { type: Date, required: true },
-  time: { type: String, required: true },
   location: { type: String, required: true },
+  organizer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   category: {
     type: String,
     required: true,
     enum: ["Technology", "Sport", "Art", "Entertainment", "Health", "Other"],
   },
-  maxAttendees: { type: Number, required: true },
+  maxAttendees: { type: Number, required: true, min: 1 },
 });
 
 export default mongoose.model<IEvent>("Event", EventSchema);

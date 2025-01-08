@@ -31,3 +31,13 @@ export const createEventSchema = Joi.object({
     "any.required": "Max attendees is required",
   }),
 });
+
+export const filterEventsSchema = Joi.object({
+  category: Joi.string()
+    .optional()
+    .valid("Technology", "Sport", "Art", "Entertainment", "Health", "Other"),
+  location: Joi.string().optional().min(1).max(50),
+  title: Joi.string().optional().min(1).max(100),
+  startDate: Joi.date().iso().optional(),
+  endDate: Joi.date().iso().optional(),
+});

@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { createEventSchema } from "../validation/EventValidation";
+import {
+  createEventSchema,
+  filterEventsSchema,
+} from "../validation/EventValidation";
 import {
   getEventById,
   createNewEvent,
@@ -42,6 +45,12 @@ export const createEvent = async (
 
 export const getEvents = async (req: Request, res: Response): Promise<void> => {
   try {
+    const { error } = filterEventsSchema.validate(req.body, {
+      abortEarly: false,
+    });
+
+    if (error) res.status(400).json({ error: "Invalid filter format" });
+
     const { category, location, title } = req.query;
 
     const filteredEvents = await getFilteredEvents(
