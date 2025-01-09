@@ -1,3 +1,4 @@
+import attendanceRoutes from "./routes/AttendanceRoutes";
 import eventRoutes from "./routes/EventRoutes";
 import authRoutes from "./routes/AuthRoutes";
 import connectDB from "./config/db";
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/attendance", attendanceRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
