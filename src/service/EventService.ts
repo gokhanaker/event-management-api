@@ -60,9 +60,23 @@ export const getEventByIdService = async (
 export const updateEventByIdService = async (
   id: string,
   event: IEvent,
+  userId: mongoose.Types.ObjectId,
+  userRole: string,
 ): Promise<IEvent | null> => {
-  const updatedEvent = await Event.findByIdAndUpdate(id, event);
-  return updatedEvent;
+  const eventFromDb = await Event.findById(id);
+  if (!eventFromDb) {
+    throw new Error("Event not found");
+  }
+
+  if (!eventFromDb.organizer.equals(userId) && userRole !== "admin") {
+    throw new Error("Forbidden to update the event");
+  }
+
+  return await Event.findByIdAndUpdate(
+    id,
+    { $set: event }, // Only update the provided fields
+    { new: true }, // Return the updated document
+  );
 };
 
 export const deleteEventByIdService = async (

@@ -1,12 +1,12 @@
 import User from "../models/User";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 export const registerUserService = async (
   password: string,
   username: string,
   email: string,
-  role: string
+  role: string,
 ): Promise<void> => {
   const existingUser = await User.findOne({ email });
 
@@ -40,8 +40,8 @@ export const loginService = async (email: string, password: string) => {
     { id: user._id, role: user.role },
     process.env.JWT_SECRET as string,
     {
-      expiresIn: "1h",
-    }
+      expiresIn: process.env.JWT_TOKEN_EXPIRATION_DURATION,
+    },
   );
 
   return token;

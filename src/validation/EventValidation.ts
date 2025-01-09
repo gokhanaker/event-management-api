@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const createEventSchema = Joi.object({
+export const createOrUpdateEventSchema = Joi.object({
   title: Joi.string().required().min(3).max(100),
   description: Joi.string().required().max(500),
   date: Joi.date().iso().required(),
