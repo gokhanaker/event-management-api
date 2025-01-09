@@ -14,14 +14,10 @@ export const createEventSchema = Joi.object({
     "date.base": "Invalid date format",
     "any.required": "Date is required",
   }),
-  time: Joi.string()
-    .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+  category: Joi.string()
     .required()
-    .messages({
-      "string.pattern.base": "Time must be in HH:mm format",
-      "any.required": "Time is required",
-    }),
-  location: Joi.string().required().min(3).max(200).messages({
+    .valid("Technology", "Sport", "Art", "Entertainment", "Health", "Other"),
+  location: Joi.string().required().min(3).max(100).messages({
     "string.empty": "Location is required",
     "string.min": "Location must be at least 3 characters",
     "string.max": "Location cannot exceed 200 characters",

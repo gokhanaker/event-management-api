@@ -1,20 +1,27 @@
+import mongoose from "mongoose";
 import Event, { IEvent } from "../models/Event";
+import { Role } from "../validation/AuthValidation";
 
 export const createNewEventService = async (
+  organizer: mongoose.Types.ObjectId,
+  userRole: string,
   title: string,
   description: string,
   date: Date,
-  time: string,
   location: string,
   category: string,
   maxAttendees: number
 ): Promise<IEvent> => {
+  if (userRole !== "organizer" && userRole !== "admin") {
+    throw new Error("User role is not valid to create a new event");
+  }
+
   const event = new Event({
     title,
     description,
     date,
-    time,
     location,
+    organizer,
     category,
     maxAttendees,
   });

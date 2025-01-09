@@ -10,17 +10,12 @@ import {
   deleteEventByIdService,
   updateEventByIdService,
 } from "../service/EventService";
+import mongoose from "mongoose";
 
 export const createEvent = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  console.log("request came with body: ", req.body);
-  console.log("request came with header: ", req.header);
-
-  const userId = req.headers["user-id"]; // Access the user ID from headers
-  const userRole = req.headers["user-role"]; // Access the user role from headers
-
   try {
     const { error } = createEventSchema.validate(req.body, {
       abortEarly: false,
@@ -28,22 +23,29 @@ export const createEvent = async (
 
     if (error) res.status(400).json({ error: "Invalid event format" });
 
-    const { title, description, date, time, location, category, maxAttendees } =
+    const userId = req.headers["user-id"]; // Access the user ID from headers
+    const userRole = req.headers["user-role"]; // Access the user role from headers
+
+    const { title, description, date, location, category, maxAttendees } =
       req.body;
 
     const event = await createNewEventService(
+      userId as unknown as mongoose.Types.ObjectId,
+      userRole as string,
       title,
       description,
       date,
-      time,
       location,
       category,
       maxAttendees
     );
 
     res.status(201).json(event);
-  } catch (err) {
-    res.status(400).json({ error: "failed to create the event" });
+  } catch (error: any) {
+    if (error.message === "User role is not valid to create a new event") {
+      res.status(403).json({ error: "Forbidden to create a new event" });
+    }
+    res.status(500).json({ error: "Failed to create the event" });
   }
 };
 

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 
 interface DecodedToken {
   id: string;
@@ -37,6 +37,11 @@ export const authenticateJWT = (
 
     next(); // Token is valid, proceed to the next middleware or route handler
   } catch (err) {
+    if (err instanceof TokenExpiredError) {
+      res.status(401).json({ error: "Access forbidden: Token is expired" });
+      return;
+    }
+
     res.status(403).json({ error: "Access forbidden: Invalid token" });
     return;
   }
