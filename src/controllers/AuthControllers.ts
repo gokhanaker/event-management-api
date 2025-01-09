@@ -1,11 +1,6 @@
 import { Request, Response } from "express";
-import { registerUserSchema } from "../validation/UserValidation";
-import User from "../models/User";
-import bcrypt from "bcrypt";
-import {
-  generateTokenService,
-  registerUserService,
-} from "../service/AuthService";
+import { registerUserSchema } from "../validation/AuthValidation";
+import { loginService, registerUserService } from "../service/AuthService";
 
 export const registerUser = async (
   req: Request,
@@ -23,17 +18,15 @@ export const registerUser = async (
     }
 
     const { username, email, password, role } = req.body;
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      res.status(400).json({ error: "Email already in use" });
-      return;
-    }
 
     await registerUserService(password, username, email, role);
     res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to register user" });
+  } catch (error: any) {
+    if (error.message === "Email already in use") {
+      res
+        .status(400)
+        .json({ error: "User with this email address already exists" });
+    } else res.status(500).json({ error: "Failed to register user" });
   }
 };
 
@@ -46,18 +39,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      res.status(401).json({ error: "Invalid credentials" });
-      return;
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      res.status(401).json({ error: "Invalid password" });
-    }
-
-    const token = await generateTokenService(user._id, user.role);
+    const token = await loginService(email, password);
     res.status(200).json({ token, message: "Login successful" });
   } catch (error) {
     res.status(500).json({ error: "Failed to login user" });

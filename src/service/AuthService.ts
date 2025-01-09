@@ -1,7 +1,6 @@
 import User from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 
 export const registerUserService = async (
   password: string,
@@ -9,6 +8,12 @@ export const registerUserService = async (
   email: string,
   role: string
 ): Promise<void> => {
+  const existingUser = await User.findOne({ email });
+
+  if (existingUser) {
+    throw new Error("Email already in use");
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({
     username,
@@ -20,11 +25,24 @@ export const registerUserService = async (
   await user.save();
 };
 
-export const generateTokenService = (
-  id: mongoose.Types.ObjectId,
-  role: string
-): string => {
-  return jwt.sign({ id: id, role: role }, process.env.JWT_SECRET as string, {
-    expiresIn: "1h",
-  });
+export const loginService = async (email: string, password: string) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("Invalid credentials");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error("Invalid password");
+  }
+
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: "1h",
+    }
+  );
+
+  return token;
 };
