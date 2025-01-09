@@ -1,8 +1,8 @@
-import express, { Request, Response } from "express";
-import dotenv from "dotenv";
-import connectDB from "./config/db";
 import eventRoutes from "./routes/EventRoutes";
 import authRoutes from "./routes/AuthRoutes";
+import connectDB from "./config/db";
+import express from "express";
+import dotenv from "dotenv";
 
 dotenv.config();
 connectDB();

@@ -14,7 +14,7 @@ interface User {
 export const authenticateJWT = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   const authHeader = req.headers.authorization;
 
@@ -28,7 +28,7 @@ export const authenticateJWT = (
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET as string
+      process.env.JWT_SECRET as string,
     ) as DecodedToken;
 
     // Attach user information to the request object for later use

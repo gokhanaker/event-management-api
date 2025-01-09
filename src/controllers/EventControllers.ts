@@ -1,8 +1,3 @@
-import { Request, Response } from "express";
-import {
-  createEventSchema,
-  filterEventsSchema,
-} from "../validation/EventValidation";
 import {
   getEventByIdService,
   createNewEventService,
@@ -10,11 +5,16 @@ import {
   deleteEventByIdService,
   updateEventByIdService,
 } from "../service/EventService";
+import {
+  createEventSchema,
+  filterEventsSchema,
+} from "../validation/EventValidation";
+import { Request, Response } from "express";
 import mongoose from "mongoose";
 
 export const createEvent = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const { error } = createEventSchema.validate(req.body, {
@@ -37,7 +37,7 @@ export const createEvent = async (
       date,
       location,
       category,
-      maxAttendees
+      maxAttendees,
     );
 
     res.status(201).json(event);
@@ -64,7 +64,7 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
       location as string,
       title as string,
       startDate as string,
-      endDate as string
+      endDate as string,
     );
 
     res.status(200).json({ events: filteredEvents });
@@ -82,9 +82,8 @@ export const getEvent = async (req: Request, res: Response) => {
 
     if (!event) {
       res.status(404).json({ error: "Event not found" });
-    } else {
-      res.status(200).json(event);
     }
+    res.status(200).json(event);
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve event" });
   }

@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
-import { registerUserSchema } from "../validation/AuthValidation";
 import { loginService, registerUserService } from "../service/AuthService";
+import { registerUserSchema } from "../validation/AuthValidation";
+import { Request, Response } from "express";
 
 export const registerUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const { error } = registerUserSchema.validate(req.body, {

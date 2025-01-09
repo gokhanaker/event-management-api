@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
 import Event, { IEvent } from "../models/Event";
+import mongoose from "mongoose";
 
 export const createNewEventService = async (
   organizer: mongoose.Types.ObjectId,
@@ -9,7 +9,7 @@ export const createNewEventService = async (
   date: Date,
   location: string,
   category: string,
-  maxAttendees: number
+  maxAttendees: number,
 ): Promise<IEvent> => {
   if (userRole !== "organizer" && userRole !== "admin") {
     throw new Error("User role is not valid to create a new event");
@@ -34,7 +34,7 @@ export const getFilteredEventsService = async (
   location: string | undefined,
   title: string | undefined,
   startDate: string | undefined,
-  endDate: string | undefined
+  endDate: string | undefined,
 ): Promise<IEvent[]> => {
   const filters: any = {};
   if (category) filters.category = category;
@@ -52,16 +52,14 @@ export const getFilteredEventsService = async (
 };
 
 export const getEventByIdService = async (
-  id: string
+  id: string,
 ): Promise<IEvent | null> => {
-  const event = await Event.findById(id);
-
-  return event;
+  return await Event.findById(id);
 };
 
 export const updateEventByIdService = async (
   id: string,
-  event: IEvent
+  event: IEvent,
 ): Promise<IEvent | null> => {
   const updatedEvent = await Event.findByIdAndUpdate(id, event);
   return updatedEvent;
@@ -70,7 +68,7 @@ export const updateEventByIdService = async (
 export const deleteEventByIdService = async (
   id: string,
   userId: mongoose.Types.ObjectId,
-  userRole: string
+  userRole: string,
 ): Promise<IEvent | null> => {
   const event = await Event.findById(id);
   if (!event) {

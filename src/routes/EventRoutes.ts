@@ -1,4 +1,3 @@
-import express from "express";
 import {
   createEvent,
   getEvent,
@@ -7,6 +6,7 @@ import {
   deleteEvent,
 } from "../controllers/EventControllers";
 import { authenticateJWT } from "../middleware/AuthMiddleware";
+import express from "express";
 
 const router = express.Router();
 
