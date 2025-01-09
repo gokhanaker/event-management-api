@@ -51,19 +51,22 @@ export const createEvent = async (
 
 export const getEvents = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { error } = filterEventsSchema.validate(req.body, {
+    const { error } = filterEventsSchema.validate(req.params, {
       abortEarly: false,
     });
 
     if (error) res.status(400).json({ error: "Invalid filter format" });
 
-    const { category, location, title } = req.query;
+    const { category, location, title, startDate, endDate } = req.query;
 
     const filteredEvents = await getFilteredEventsService(
       category as string,
       location as string,
-      title as string
+      title as string,
+      startDate as string,
+      endDate as string
     );
+
     res.status(200).json({ events: filteredEvents });
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve events" });
