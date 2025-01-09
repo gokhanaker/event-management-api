@@ -22,10 +22,8 @@ export const registerUser = async (
     await registerUserService(password, username, email, role);
     res.status(201).json({ message: "User registered successfully" });
   } catch (error: any) {
-    if (error.message === "Email already in use") {
-      res
-        .status(400)
-        .json({ error: "User with this email address already exists" });
+    if (error.message === "User already exists with this email address") {
+      res.status(400).json({ error: error.message });
     } else res.status(500).json({ error: "Failed to register user" });
   }
 };

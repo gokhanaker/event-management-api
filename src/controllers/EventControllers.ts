@@ -23,15 +23,15 @@ export const createEvent = async (
 
     if (error) res.status(400).json({ error: "Invalid event format" });
 
-    const userId = req.headers["user-id"]; // Access the user ID from headers
-    const userRole = req.headers["user-role"]; // Access the user role from headers
+    const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId; // Access the user ID from headers
+    const userRole = req.headers["user-role"] as string; // Access the user role from headers
 
     const { title, description, date, location, category, maxAttendees } =
       req.body;
 
     const event = await createNewEventService(
-      userId as unknown as mongoose.Types.ObjectId,
-      userRole as string,
+      userId,
+      userRole,
       title,
       description,
       date,
@@ -43,7 +43,7 @@ export const createEvent = async (
     res.status(201).json(event);
   } catch (error: any) {
     if (error.message === "User role is not valid to create a new event") {
-      res.status(403).json({ error: "Forbidden to create a new event" });
+      res.status(403).json({ error: error.message });
     }
     res.status(500).json({ error: "Failed to create the event" });
   }
@@ -111,9 +111,16 @@ export const deleteEvent = async (req: Request, res: Response) => {
 
     if (!id) return res.status(400).json({ error: "Event id is required" });
 
-    const event = await deleteEventByIdService(id as string);
+    const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId; // Access the user ID from headers
+    const userRole = req.headers["user-role"] as string; // Access the user role from headers
+
+    const event = await deleteEventByIdService(id, userId, userRole);
     return res.status(200).json(event);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete event" });
+  } catch (error: any) {
+    if (error.message === "Event not found") {
+      res.status(404).json({ error: error.message });
+    } else if (error.message === "Forbidden to delete the event") {
+      res.status(403).json({ error: error.message });
+    } else res.status(500).json({ error: "Failed to delete event" });
   }
 };

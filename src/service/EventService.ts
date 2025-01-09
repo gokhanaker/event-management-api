@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import Event, { IEvent } from "../models/Event";
-import { Role } from "../validation/AuthValidation";
 
 export const createNewEventService = async (
   organizer: mongoose.Types.ObjectId,
@@ -59,8 +58,19 @@ export const updateEventByIdService = async (
 };
 
 export const deleteEventByIdService = async (
-  id: string
+  id: string,
+  userId: mongoose.Types.ObjectId,
+  userRole: string
 ): Promise<IEvent | null> => {
-  const event = await Event.findByIdAndDelete(id);
-  return event;
+  const event = await Event.findById(id);
+  if (!event) {
+    throw new Error("Event not found");
+  }
+
+  if (!event.organizer.equals(userId) && userRole !== "admin") {
+    throw new Error("Forbidden to delete the event");
+  }
+
+  const deletedEvent = await Event.findByIdAndDelete(id);
+  return deletedEvent;
 };
