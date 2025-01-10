@@ -41,7 +41,7 @@ export const loginService = async (email: string, password: string) => {
     { id: user._id, role: user.role }, // JWT includes user id and user role data fields
     process.env.JWT_SECRET as string,
     {
-      expiresIn: process.env.JWT_TOKEN_EXPIRATION_DURATION,
+      expiresIn: process.env.JWT_EXPIRATION_DURATION,
     },
   );
 
