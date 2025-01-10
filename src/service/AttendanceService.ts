@@ -13,8 +13,8 @@ export const attendEventService = async (
   }
 
   const existingAttendance = await Attendance.findOne({
-    user: userId,
-    event: eventId,
+    userId,
+    eventId,
   });
 
   if (existingAttendance) {
