@@ -6,7 +6,7 @@ export interface IAttendance extends Document {
   attendedAt: Date;
 }
 
-const attendenceSchema = new Schema<IAttendance>(
+const attendanceSchema = new Schema<IAttendance>(
   {
     userId: {
       type: mongoose.Schema.ObjectId,
@@ -28,4 +28,4 @@ const attendenceSchema = new Schema<IAttendance>(
   },
 );
 
-export default mongoose.model<IAttendance>("Attendence", attendenceSchema);
+export default mongoose.model<IAttendance>("Attendance", attendanceSchema);

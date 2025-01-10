@@ -1,3 +1,4 @@
+import { ERRORS } from "../constants/errors";
 import User from "../models/User";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -11,7 +12,7 @@ export const registerUserService = async (
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
-    throw new Error("User already exists with this email address");
+    throw new Error(ERRORS.USER_ALREADY_EXISTS);
   }
 
   const hashedPassword: string = await bcrypt.hash(password, 10);
@@ -28,12 +29,12 @@ export const registerUserService = async (
 export const loginService = async (email: string, password: string) => {
   const user = await User.findOne({ email });
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw new Error(ERRORS.INVALID_CREDENTIALS);
   }
 
   const isMatch: boolean = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new Error("Invalid password");
+    throw new Error(ERRORS.INVALID_PASSWORD);
   }
 
   const token: string = jwt.sign(

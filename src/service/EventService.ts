@@ -1,4 +1,5 @@
 import Event, { IEvent } from "../models/Event";
+import { ERRORS } from "../constants/errors";
 import mongoose from "mongoose";
 
 export const createNewEventService = async (
@@ -12,7 +13,7 @@ export const createNewEventService = async (
   maxAttendees: number,
 ): Promise<IEvent> => {
   if (userRole !== "organizer" && userRole !== "admin") {
-    throw new Error("User role is not valid to create a new event");
+    throw new Error(ERRORS.FORBIDDEN);
   }
 
   const event = new Event({
@@ -65,11 +66,11 @@ export const updateEventByIdService = async (
 ): Promise<IEvent | null> => {
   const eventFromDb = await Event.findById(id);
   if (!eventFromDb) {
-    throw new Error("Event not found");
+    throw new Error(ERRORS.EVENT_NOT_FOUND);
   }
 
   if (!eventFromDb.organizer.equals(userId) && userRole !== "admin") {
-    throw new Error("Forbidden to update the event");
+    throw new Error(ERRORS.FORBIDDEN);
   }
 
   return await Event.findByIdAndUpdate(
@@ -86,11 +87,11 @@ export const deleteEventByIdService = async (
 ): Promise<IEvent | null> => {
   const event = await Event.findById(id);
   if (!event) {
-    throw new Error("Event not found");
+    throw new Error(ERRORS.EVENT_NOT_FOUND);
   }
 
   if (!event.organizer.equals(userId) && userRole !== "admin") {
-    throw new Error("Forbidden to delete the event");
+    throw new Error(ERRORS.FORBIDDEN);
   }
 
   const deletedEvent = await Event.findByIdAndDelete(id);

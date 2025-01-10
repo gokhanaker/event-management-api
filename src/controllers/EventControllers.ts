@@ -9,6 +9,7 @@ import {
   createOrUpdateEventSchema,
   filterEventsSchema,
 } from "../validation/EventValidation";
+import { ERRORS } from "../constants/errors";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 
@@ -22,7 +23,7 @@ export const createEvent = async (
     });
 
     if (error) {
-      return res.status(400).json({ error: "Invalid event format" });
+      return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
     }
 
     const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId; // Access the user ID from headers
@@ -44,7 +45,7 @@ export const createEvent = async (
 
     return res.status(201).json(event);
   } catch (error: any) {
-    if (error.message === "User role is not valid to create a new event") {
+    if (error.message === ERRORS.FORBIDDEN) {
       return res.status(403).json({ error: error.message });
     }
     return res.status(500).json({ error: "Failed to create the event" });
@@ -78,7 +79,7 @@ export const getEvents = async (req: Request, res: Response): Promise<any> => {
 export const getEvent = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
-    if (!id) return res.status(400).json({ error: "Event id is required" });
+    if (!id) return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
 
     const event = await getEventByIdService(id as string);
 
@@ -94,13 +95,12 @@ export const updateEvent = async (
 ): Promise<any> => {
   try {
     const { id } = req.params;
-    if (!id) return res.status(400).json({ error: "Event id is required" });
-
     const { error } = createOrUpdateEventSchema.validate(req.body, {
       abortEarly: false,
     });
 
-    if (error) return res.status(400).json({ error: "Invalid event format" });
+    if (!id || error)
+      return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
 
     const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId;
     const userRole = req.headers["user-role"] as string;
@@ -113,10 +113,10 @@ export const updateEvent = async (
     );
     return res.status(200).json(event);
   } catch (error: any) {
-    if (error.message === "Event not found") {
-      return res.status(404).json({ error: error.message });
-    } else if (error.message === "Forbidden to update the event") {
+    if (error.message === ERRORS.FORBIDDEN) {
       return res.status(403).json({ error: error.message });
+    } else if (error.message === ERRORS.EVENT_NOT_FOUND) {
+      return res.status(404).json({ error: error.message });
     }
     return res.status(500).json({ error: "Failed to update event" });
   }
@@ -137,10 +137,11 @@ export const deleteEvent = async (
     const event = await deleteEventByIdService(id, userId, userRole);
     return res.status(200).json(event);
   } catch (error: any) {
-    if (error.message === "Event not found") {
-      return res.status(404).json({ error: error.message });
-    } else if (error.message === "Forbidden to delete the event") {
+    if (error.message === ERRORS.FORBIDDEN) {
       return res.status(403).json({ error: error.message });
-    } else res.status(500).json({ error: "Failed to delete event" });
+    } else if (error.message === ERRORS.EVENT_NOT_FOUND) {
+      return res.status(404).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Failed to delete event" });
   }
 };
