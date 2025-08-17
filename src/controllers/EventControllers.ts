@@ -9,25 +9,31 @@ import {
   createOrUpdateEventSchema,
   filterEventsSchema,
 } from "../validation/EventValidation";
-import { ERRORS } from "../constants/errors";
-import { Request, Response } from "express";
+import { successResponse } from "../utils/responseHandler";
+import { asyncHandler } from "../middleware/errorHandler";
+import { ValidationError } from "../utils/errorHandler";
+import { AuthenticatedRequest } from "../types/express";
+import { Response } from "express";
 import mongoose from "mongoose";
 
-export const createEvent = async (
-  req: Request,
-  res: Response,
-): Promise<any> => {
-  try {
+export const createEvent = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const { error } = createOrUpdateEventSchema.validate(req.body, {
       abortEarly: false,
     });
 
     if (error) {
-      return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
+      throw new ValidationError(
+        error.details.map((detail) => detail.message).join(", "),
+      );
     }
 
-    const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId; // Access the user ID from headers
-    const userRole = req.headers["user-role"] as string; // Access the user role from headers
+    if (!req.user) {
+      throw new ValidationError("User not authenticated");
+    }
+
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const userRole = req.user.role;
 
     const { title, description, date, location, category, maxAttendees } =
       req.body;
@@ -43,23 +49,18 @@ export const createEvent = async (
       maxAttendees,
     );
 
-    return res.status(201).json(event);
-  } catch (error: any) {
-    if (error.message === ERRORS.FORBIDDEN) {
-      return res.status(403).json({ error: error.message });
-    }
-    return res.status(500).json({ error: "Failed to create the event" });
-  }
-};
+    successResponse(res, event, "Event created successfully", 201);
+  },
+);
 
-export const getEvents = async (req: Request, res: Response): Promise<any> => {
-  try {
+export const getEvents = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const { error } = filterEventsSchema.validate(req.params, {
       abortEarly: false,
     });
 
     if (error) {
-      return res.status(400).json({ error: "Invalid filter format" });
+      throw new ValidationError("Invalid filter format");
     }
 
     const { category, location, title, startDate, endDate } = req.query;
@@ -72,43 +73,48 @@ export const getEvents = async (req: Request, res: Response): Promise<any> => {
       endDate as string,
     );
 
-    return res.status(200).json({ events: filteredEvents });
-  } catch {
-    return res.status(500).json({ error: "Failed to retrieve events" });
-  }
-};
+    successResponse(
+      res,
+      { events: filteredEvents },
+      "Events retrieved successfully",
+    );
+  },
+);
 
-export const getEvent = async (req: Request, res: Response): Promise<any> => {
-  try {
+export const getEvent = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     if (!id) {
-      return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
+      throw new ValidationError("Event ID is required");
     }
 
     const event = await getEventByIdService(id as string);
 
-    return res.status(200).json(event);
-  } catch {
-    return res.status(500).json({ error: "Failed to retrieve event" });
-  }
-};
+    successResponse(res, event, "Event retrieved successfully");
+  },
+);
 
-export const updateEvent = async (
-  req: Request,
-  res: Response,
-): Promise<any> => {
-  try {
+export const updateEvent = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
     const { error } = createOrUpdateEventSchema.validate(req.body, {
       abortEarly: false,
     });
 
     if (!id || error) {
-      return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
+      throw new ValidationError(
+        error
+          ? error.details.map((detail) => detail.message).join(", ")
+          : "Event ID is required",
+      );
     }
 
-    const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId;
-    const userRole = req.headers["user-role"] as string;
+    if (!req.user) {
+      throw new ValidationError("User not authenticated");
+    }
+
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const userRole = req.user.role;
 
     const event = await updateEventByIdService(
       id as string,
@@ -116,39 +122,28 @@ export const updateEvent = async (
       userId,
       userRole,
     );
-    return res.status(200).json(event);
-  } catch (error: any) {
-    if (error.message === ERRORS.FORBIDDEN) {
-      return res.status(403).json({ error: error.message });
-    } else if (error.message === ERRORS.EVENT_NOT_FOUND) {
-      return res.status(404).json({ error: error.message });
-    }
-    return res.status(500).json({ error: "Failed to update event" });
-  }
-};
 
-export const deleteEvent = async (
-  req: Request,
-  res: Response,
-): Promise<any> => {
-  try {
+    successResponse(res, event, "Event updated successfully");
+  },
+);
+
+export const deleteEvent = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
 
     if (!id) {
-      return res.status(400).json({ error: "Event id is required" });
+      throw new ValidationError("Event ID is required");
     }
 
-    const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId; // Access the user ID from headers
-    const userRole = req.headers["user-role"] as string; // Access the user role from headers
+    if (!req.user) {
+      throw new ValidationError("User not authenticated");
+    }
+
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+    const userRole = req.user.role;
 
     const event = await deleteEventByIdService(id, userId, userRole);
-    return res.status(200).json(event);
-  } catch (error: any) {
-    if (error.message === ERRORS.FORBIDDEN) {
-      return res.status(403).json({ error: error.message });
-    } else if (error.message === ERRORS.EVENT_NOT_FOUND) {
-      return res.status(404).json({ error: error.message });
-    }
-    return res.status(500).json({ error: "Failed to delete event" });
-  }
-};
+
+    successResponse(res, event, "Event deleted successfully");
+  },
+);

@@ -46,13 +46,13 @@ export default [
       "@typescript-eslint/no-unsafe-function-type": "off",
       "prefer-const": "error",
       "no-var": "error",
-      "no-console": "off", // Allow console for server logging
+      "no-console": "off",
       eqeqeq: ["error", "always"],
       curly: ["error", "all"],
       "no-duplicate-imports": "error",
       "no-unreachable": "error",
       "no-unused-expressions": "error",
-      "no-undef": "off", // TypeScript handles this
+      "no-undef": "off",
     },
   },
   {

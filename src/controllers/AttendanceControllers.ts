@@ -1,35 +1,34 @@
 import { attendEventService } from "../service/AttendanceService";
-import { ERRORS } from "../constants/errors";
-import { Request, Response } from "express";
+import { successResponse } from "../utils/responseHandler";
+import { asyncHandler } from "../middleware/errorHandler";
+import { ValidationError } from "../utils/errorHandler";
+import { AuthenticatedRequest } from "../types/express";
+import { Response } from "express";
 import mongoose from "mongoose";
 
-export const attendEvent = async (
-  req: Request,
-  res: Response,
-): Promise<any> => {
-  try {
-    const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId;
+export const attendEvent = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response) => {
     const { eventId } = req.params;
 
     if (!eventId) {
-      return res.status(400).json({ error: "Event id is missing" });
+      throw new ValidationError("Event id is missing");
     }
 
+    if (!req.user) {
+      throw new ValidationError("User not authenticated");
+    }
+
+    const userId = new mongoose.Types.ObjectId(req.user.id);
     const attendance = await attendEventService(
       userId,
       new mongoose.Types.ObjectId(eventId),
     );
-    return res
-      .status(201)
-      .json({ message: "User successfully attended the event", attendance });
-  } catch (error: any) {
-    if (error.message === ERRORS.USER_ALREADY_ATTENDING) {
-      return res.status(400).json({ error: error.message });
-    } else if (error.message === ERRORS.EVENT_FULL) {
-      return res.status(403).json({ error: error.message });
-    } else if (error.message === ERRORS.EVENT_NOT_FOUND) {
-      return res.status(404).json({ error: error.message });
-    }
-    return res.status(500).json({ error: "Failed to attend to event" });
-  }
-};
+
+    successResponse(
+      res,
+      { attendance },
+      "User successfully attended the event",
+      201,
+    );
+  },
+);
