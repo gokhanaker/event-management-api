@@ -1,46 +1,37 @@
 import { loginService, registerUserService } from "../service/AuthService";
+import { RegisterUserRequest, LoginRequest } from "../types/express";
 import { registerUserSchema } from "../validation/AuthValidation";
-import { ERRORS } from "../constants/errors";
-import { Request, Response } from "express";
+import { successResponse } from "../utils/responseHandler";
+import { asyncHandler } from "../middleware/errorHandler";
+import { ValidationError } from "../utils/errorHandler";
+import { Response } from "express";
 
-export const registerUser = async (req: Request, res: Response) => {
-  try {
+export const registerUser = asyncHandler(
+  async (req: RegisterUserRequest, res: Response) => {
     const { error } = registerUserSchema.validate(req.body, {
       abortEarly: false,
     });
+
     if (error) {
-      res.status(400).json({ errors: ERRORS.INVALID_PAYLOAD });
-      return;
+      throw new ValidationError(
+        error.details.map((detail) => detail.message).join(", "),
+      );
     }
 
     const { username, email, password, role } = req.body;
 
     await registerUserService(password, username, email, role);
-    return res.status(201).json({ message: "User registered successfully" });
-  } catch (error: any) {
-    if (error.message === ERRORS.USER_ALREADY_EXISTS) {
-      return res.status(400).json({ error: error.message });
-    }
-    return res.status(500).json({ error: "Failed to register user" });
+    successResponse(res, null, "User registered successfully", 201);
+  },
+);
+
+export const login = asyncHandler(async (req: LoginRequest, res: Response) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new ValidationError("Email and password are required");
   }
-};
 
-export const login = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
-    }
-
-    const token = await loginService(email, password);
-    return res.status(200).json({ token, message: "Login successful" });
-  } catch (error: any) {
-    if (error.message === ERRORS.INVALID_CREDENTIALS) {
-      return res.status(401).json({ error: error.message });
-    } else if (error.message === ERRORS.INVALID_PASSWORD) {
-      return res.status(401).json({ error: error.message });
-    }
-    return res.status(500).json({ error: "Failed to login user" });
-  }
-};
+  const token = await loginService(email, password);
+  successResponse(res, { token }, "Login successful");
+});
