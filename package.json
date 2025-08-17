@@ -7,10 +7,23 @@
     "start": "node dist/server.js",
     "build": "tsc",
     "dev": "ts-node-dev --respawn src/server.ts",
-    "lint": "eslint src --ext .ts",
-    "clean": "rimraf dist"
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "clean": "rimraf dist",
+    "docker:build": "docker build -t event-management-api .",
+    "docker:run": "docker run -p 6000:6000 event-management-api",
+    "docker:compose": "docker-compose up -d",
+    "docker:compose:down": "docker-compose down",
+    "docker:compose:logs": "docker-compose logs -f",
+    "test": "echo \"No tests specified\" && exit 0",
+    "test:watch": "echo \"No tests specified\" && exit 0",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
+    "type-check": "tsc --noEmit"
   },
-  "keywords": [],
+  "keywords": [
+    "event-management"
+  ],
   "author": "Gokhan",
   "license": "MIT",
   "dependencies": {
@@ -19,6 +32,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-rate-limit": "^7.1.5",
     "helmet": "^8.0.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
@@ -29,6 +43,7 @@
     "@types/body-parser": "^1.19.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/express-rate-limit": "^6.0.0",
     "@types/helmet": "^0.0.48",
     "@types/joi": "^17.2.2",
     "@types/jsonwebtoken": "^9.0.7",
@@ -39,7 +54,12 @@
     "eslint": "^9.17.0",
     "prettier": "^3.4.2",
     "prettier-plugin-sort-imports": "^1.8.6",
+    "rimraf": "^5.0.5",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
