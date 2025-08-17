@@ -38,15 +38,25 @@ export const getFilteredEventsService = async (
   endDate: string | undefined,
 ): Promise<IEvent[]> => {
   const filters: any = {};
-  if (category) filters.category = category;
-  if (location) filters.location = { $regex: location, $options: "i" }; // i for case-insensitive
-  if (title) filters.title = { $regex: title, $options: "i" };
+  if (category) {
+    filters.category = category;
+  }
+  if (location) {
+    filters.location = { $regex: location, $options: "i" };
+  } // i for case-insensitive
+  if (title) {
+    filters.title = { $regex: title, $options: "i" };
+  }
 
   // Add date range filter
   if (startDate || endDate) {
     filters.date = {};
-    if (startDate) filters.date.$gte = new Date(startDate); // Greater than or equal to startDate
-    if (endDate) filters.date.$lte = new Date(endDate); // Less than or equal to endDate
+    if (startDate) {
+      filters.date.$gte = new Date(startDate);
+    } // Greater than or equal to startDate
+    if (endDate) {
+      filters.date.$lte = new Date(endDate);
+    } // Less than or equal to endDate
   }
 
   return await Event.find(filters);

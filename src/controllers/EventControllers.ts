@@ -58,7 +58,9 @@ export const getEvents = async (req: Request, res: Response): Promise<any> => {
       abortEarly: false,
     });
 
-    if (error) return res.status(400).json({ error: "Invalid filter format" });
+    if (error) {
+      return res.status(400).json({ error: "Invalid filter format" });
+    }
 
     const { category, location, title, startDate, endDate } = req.query;
 
@@ -71,7 +73,7 @@ export const getEvents = async (req: Request, res: Response): Promise<any> => {
     );
 
     return res.status(200).json({ events: filteredEvents });
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: "Failed to retrieve events" });
   }
 };
@@ -79,12 +81,14 @@ export const getEvents = async (req: Request, res: Response): Promise<any> => {
 export const getEvent = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
-    if (!id) return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
+    if (!id) {
+      return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
+    }
 
     const event = await getEventByIdService(id as string);
 
     return res.status(200).json(event);
-  } catch (error) {
+  } catch {
     return res.status(500).json({ error: "Failed to retrieve event" });
   }
 };
@@ -99,8 +103,9 @@ export const updateEvent = async (
       abortEarly: false,
     });
 
-    if (!id || error)
+    if (!id || error) {
       return res.status(400).json({ error: ERRORS.INVALID_PAYLOAD });
+    }
 
     const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId;
     const userRole = req.headers["user-role"] as string;
@@ -129,7 +134,9 @@ export const deleteEvent = async (
   try {
     const { id } = req.params;
 
-    if (!id) return res.status(400).json({ error: "Event id is required" });
+    if (!id) {
+      return res.status(400).json({ error: "Event id is required" });
+    }
 
     const userId = req.headers["user-id"] as unknown as mongoose.Types.ObjectId; // Access the user ID from headers
     const userRole = req.headers["user-role"] as string; // Access the user role from headers
