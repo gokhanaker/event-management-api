@@ -1,0 +1,636 @@
+{
+  "info": {
+    "name": "Event Management API",
+    "description": "A collection for testing the Event Management API endpoints. This API supports user authentication, event management, and attendance tracking.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:6000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Check the health status of the API and database connection"
+      },
+      "response": []
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"User registered successfully\", function () {",
+                  "        pm.response.to.have.status(201);",
+                  "    });",
+                  "    ",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.test(\"Response has success message\", function () {",
+                  "        pm.expect(responseJson.message).to.eql(\"User registered successfully\");",
+                  "    });",
+                  "} else {",
+                  "    pm.test(\"Registration failed\", function () {",
+                  "        pm.response.to.have.status(400);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user with username, email, password, and role. Available roles: user, organizer, admin"
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"Login successful\", function () {",
+                  "        pm.response.to.have.status(200);",
+                  "    });",
+                  "    ",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.test(\"Response contains token\", function () {",
+                  "        pm.expect(responseJson.data.token).to.be.a('string');",
+                  "    });",
+                  "    ",
+                  "    // Store the token for other requests",
+                  "    if (responseJson.data && responseJson.data.token) {",
+                  "        pm.collectionVariables.set(\"authToken\", responseJson.data.token);",
+                  "    }",
+                  "} else {",
+                  "    pm.test(\"Login failed\", function () {",
+                  "        pm.response.to.have.status(401);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with email and password to get JWT token"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Organizer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"event_organizer\",\n  \"email\": \"organizer@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"organizer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register an organizer account to create events"
+          },
+          "response": []
+        },
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_user\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register an admin account with full permissions"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints for user registration and login"
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Create Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Event created successfully\", function () {",
+                  "        pm.response.to.have.status(201);",
+                  "    });",
+                  "    ",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.test(\"Response contains event data\", function () {",
+                  "        pm.expect(responseJson.data).to.have.property('_id');",
+                  "        pm.expect(responseJson.data).to.have.property('title');",
+                  "    });",
+                  "    ",
+                  "    // Store the event ID for other requests",
+                  "    if (responseJson.data && responseJson.data._id) {",
+                  "        pm.collectionVariables.set(\"eventId\", responseJson.data._id);",
+                  "    }",
+                  "} else {",
+                  "    pm.test(\"Event creation failed\", function () {",
+                  "        pm.response.to.have.status(400);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Tech Conference 2024\",\n  \"description\": \"Annual technology conference featuring the latest innovations in software development, AI, and cloud computing.\",\n  \"date\": \"2024-06-15T10:00:00.000Z\",\n  \"location\": \"San Francisco, CA\",\n  \"category\": \"Technology\",\n  \"maxAttendees\": 100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"]
+            },
+            "description": "Create a new event. Requires organizer or admin role. Available categories: Technology, Sport, Art, Entertainment, Health, Other"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Events",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Get events successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "pm.test(\"Response contains events array\", function () {",
+                  "    pm.expect(responseJson.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"]
+            },
+            "description": "Get all events. Supports filtering by category, location, title, startDate, and endDate as query parameters"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Events with Filters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/events?category=Technology&location=San Francisco&startDate=2024-06-01T00:00:00.000Z&endDate=2024-06-30T23:59:59.000Z",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Technology"
+                },
+                {
+                  "key": "location",
+                  "value": "San Francisco"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-06-01T00:00:00.000Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-06-30T23:59:59.000Z"
+                }
+              ]
+            },
+            "description": "Get events with filters. Available filters: category, location, title, startDate, endDate"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Event by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Get event successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "pm.test(\"Response contains event data\", function () {",
+                  "    pm.expect(responseJson.data).to.have.property('_id');",
+                  "    pm.expect(responseJson.data).to.have.property('title');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/events/{{eventId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events", "{{eventId}}"]
+            },
+            "description": "Get a specific event by its ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Event updated successfully\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "pm.test(\"Response contains updated event data\", function () {",
+                  "    pm.expect(responseJson.data).to.have.property('_id');",
+                  "    pm.expect(responseJson.data.title).to.eql(\"Updated Tech Conference 2024\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Tech Conference 2024\",\n  \"maxAttendees\": 150,\n  \"description\": \"Updated description for the tech conference\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events/{{eventId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events", "{{eventId}}"]
+            },
+            "description": "Update an event. Only the event organizer or admin can update events"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Event deleted successfully\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/events/{{eventId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events", "{{eventId}}"]
+            },
+            "description": "Delete an event. Only the event organizer or admin can delete events"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sport Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Marathon 2024\",\n  \"description\": \"Annual city marathon with multiple categories and distances.\",\n  \"date\": \"2024-07-20T08:00:00.000Z\",\n  \"location\": \"New York, NY\",\n  \"category\": \"Sport\",\n  \"maxAttendees\": 500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"]
+            },
+            "description": "Create a sport event example"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Art Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Art Exhibition\",\n  \"description\": \"Contemporary art exhibition featuring local and international artists.\",\n  \"date\": \"2024-08-10T18:00:00.000Z\",\n  \"location\": \"Los Angeles, CA\",\n  \"category\": \"Art\",\n  \"maxAttendees\": 200\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"]
+            },
+            "description": "Create an art event example"
+          },
+          "response": []
+        }
+      ],
+      "description": "Event management endpoints for CRUD operations"
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Attend Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Attendance recorded successfully\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "pm.test(\"Response contains success message\", function () {",
+                  "    pm.expect(responseJson.message).to.include(\"attending\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/attendance/{{eventId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "attendance", "{{eventId}}"]
+            },
+            "description": "Mark attendance for a specific event"
+          },
+          "response": []
+        }
+      ],
+      "description": "Attendance tracking endpoints"
+    },
+    {
+      "name": "Error Testing",
+      "item": [
+        {
+          "name": "Invalid Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nonexistent@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Test invalid login credentials"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Event Without Auth",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Unauthorized Event\",\n  \"description\": \"This should fail\",\n  \"date\": \"2024-06-15T10:00:00.000Z\",\n  \"location\": \"Test Location\",\n  \"category\": \"Technology\",\n  \"maxAttendees\": 10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"]
+            },
+            "description": "Test creating event without authentication"
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Event Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"description\": \"Invalid event with empty title\",\n  \"date\": \"invalid-date\",\n  \"location\": \"\",\n  \"category\": \"InvalidCategory\",\n  \"maxAttendees\": -5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "events"]
+            },
+            "description": "Test event creation with invalid data"
+          },
+          "response": []
+        }
+      ],
+      "description": "Error testing scenarios"
+    }
+  ]
+}
