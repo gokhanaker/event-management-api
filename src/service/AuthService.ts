@@ -10,7 +10,7 @@ export const registerUserService = async (
   username: string,
   email: string,
   role: string,
-): Promise<void> => {
+): Promise<string> => {
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
@@ -26,6 +26,17 @@ export const registerUserService = async (
   });
 
   await user.save();
+
+  // Generate JWT token for the newly registered user
+  const token: string = jwt.sign(
+    { id: user._id, role: user.role },
+    config.JWT_SECRET,
+    {
+      expiresIn: config.JWT_EXPIRATION_DURATION,
+    },
+  );
+
+  return token;
 };
 
 export const loginService = async (email: string, password: string) => {

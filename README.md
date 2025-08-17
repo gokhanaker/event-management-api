@@ -39,8 +39,8 @@ A RESTful API built with Node.js, TypeScript, Express, and MongoDB for managing 
    NODE_ENV=development
    PORT=6000
    MONGO_URI=mongodb://localhost:27017/event-management
-   JWT_SECRET=your-super-secret-jwt-key-change-in
-   JWT_EXPIRATION_DURATION=24h
+   JWT_SECRET=your-secret-jwt-key
+   JWT_EXPIRATION_DURATION=4h
    CORS_ORIGIN=http://localhost:3000
    ```
 
@@ -57,10 +57,10 @@ A RESTful API built with Node.js, TypeScript, Express, and MongoDB for managing 
 
    ```bash
    # Start all services (app, MongoDB, Mongo Express)
-   npm run docker:compose
+   docker compose up
 
    # Stop services
-   npm run docker:compose:down
+   docker:compose down
    ```
 
 ## 🔧 Available Scripts
@@ -70,5 +70,5 @@ A RESTful API built with Node.js, TypeScript, Express, and MongoDB for managing 
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues automatically
 - `npm run clean` - Clean build directory
-- `npm run docker:compose` - Start with Docker Compose
-- `npm run docker:compose:down` - Stop Docker Compose services
+- `npm run docker:dev` - Start with Docker Compose
+- `npm run docker:down` - Stop Docker Compose services

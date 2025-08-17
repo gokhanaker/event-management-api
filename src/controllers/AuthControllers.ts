@@ -20,8 +20,8 @@ export const registerUser = asyncHandler(
 
     const { username, email, password, role } = req.body;
 
-    await registerUserService(password, username, email, role);
-    successResponse(res, null, "User registered successfully", 201);
+    const token = await registerUserService(password, username, email, role);
+    successResponse(res, { token }, "User registered successfully", 201);
   },
 );
 
