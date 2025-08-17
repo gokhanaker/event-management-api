@@ -1,4 +1,4 @@
-import Attendance, { IAttendance } from "../models/Attendence";
+import Attendance, { IAttendance } from "../models/Attendance";
 import { ERRORS } from "../constants/errors";
 import Event from "../models/Event";
 import mongoose from "mongoose";
