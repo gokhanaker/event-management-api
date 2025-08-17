@@ -3,6 +3,7 @@ import attendanceRoutes from "./routes/AttendanceRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 import { rateLimiter } from "./middleware/rateLimiter";
 import eventRoutes from "./routes/EventRoutes";
+import authRoutes from "./routes/AuthRoutes";
 import { config } from "./config/env";
 import connectDB from "./config/db";
 import express from "express";
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(rateLimiter);
 app.get("/health", healthCheck);
 
+app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/attendance", attendanceRoutes);
 
@@ -48,8 +50,8 @@ const gracefulShutdown = (signal: string) => {
   process.exit(0);
 };
 
-process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
 
 const server = app.listen(config.PORT, () => {
   console.log(`🚀 Server running on port ${config.PORT}`);
