@@ -1,5 +1,5 @@
-# Use Node.js 18 Alpine as base image
-FROM node:18-alpine
+# Use Node.js 18 Debian-based image for better native dependency support
+FROM node:18-slim
 
 # Set working directory
 WORKDIR /app
