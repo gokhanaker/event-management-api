@@ -1,7 +1,7 @@
 {
   "name": "event-management-api",
   "version": "1.0.0",
-  "description": "A mini event management API built with TypeScript, Express, and MongoDB",
+  "description": "An event management API built with TypeScript, Express, and MongoDB",
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
@@ -14,7 +14,6 @@
     "docker:run": "docker run -p 6000:6000 event-management-api",
     "docker:compose": "docker-compose up -d",
     "docker:compose:down": "docker-compose down",
-    "docker:compose:logs": "docker-compose logs -f",
     "test": "echo \"No tests specified\" && exit 0",
     "test:watch": "echo \"No tests specified\" && exit 0",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",

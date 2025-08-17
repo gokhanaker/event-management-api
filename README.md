@@ -4,14 +4,14 @@ A RESTful API built with Node.js, TypeScript, Express, and MongoDB for managing 
 
 ## 🚀 Features
 
-- **User Registration & Authorization**: JWT-based authentication with role-based access control
-- **Event Management**: Full CRUD operations for events
+- **User Registration & Authorization**: User registration and JWT-based authentication with role-based access control
+- **Event Management**: Full CRUD operations and attending for events
 - **Attendance Tracking**: Track user attendance at events
 
 ## 📋 Prerequisites
 
-- Node.js >= 18.0.0
-- npm >= 8.0.0
+- Node.js
+- npm
 - MongoDB
 - Docker
 
@@ -59,9 +59,6 @@ A RESTful API built with Node.js, TypeScript, Express, and MongoDB for managing 
    # Start all services (app, MongoDB, Mongo Express)
    npm run docker:compose
 
-   # View logs
-   npm run docker:compose:logs
-
    # Stop services
    npm run docker:compose:down
    ```
@@ -70,11 +67,8 @@ A RESTful API built with Node.js, TypeScript, Express, and MongoDB for managing 
 
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build the application
-- `npm start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues automatically
-- `npm run format` - Format code with Prettier
-- `npm run type-check` - Run TypeScript type checking
 - `npm run clean` - Clean build directory
 - `npm run docker:compose` - Start with Docker Compose
 - `npm run docker:compose:down` - Stop Docker Compose services

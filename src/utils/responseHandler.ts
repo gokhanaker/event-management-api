@@ -1,4 +1,4 @@
-import { ApiResponse, PaginatedResponse } from "../types/express";
+import { ApiResponse } from "../types/express";
 import { Response } from "express";
 
 export const successResponse = <T>(
@@ -15,44 +15,4 @@ export const successResponse = <T>(
   };
 
   res.status(statusCode).json(response);
-};
-
-export const errorResponse = (
-  res: Response,
-  error: string,
-  statusCode: number = 500,
-): void => {
-  const response: ApiResponse = {
-    success: false,
-    error,
-    timestamp: new Date().toISOString(),
-  };
-
-  res.status(statusCode).json(response);
-};
-
-export const paginatedResponse = <T>(
-  res: Response,
-  data: T[],
-  page: number,
-  limit: number,
-  total: number,
-  message: string = "Success",
-): void => {
-  const totalPages = Math.ceil(total / limit);
-
-  const response: PaginatedResponse<T> = {
-    success: true,
-    data,
-    message,
-    timestamp: new Date().toISOString(),
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages,
-    },
-  };
-
-  res.status(200).json(response);
 };

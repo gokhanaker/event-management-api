@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Event Management API",
-    "description": "A collection for testing the Event Management API endpoints. This API supports user authentication, event management, and attendance tracking.",
+    "description": "A collection for testing the Event Management API endpoints",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "version": "1.0.0"
   },

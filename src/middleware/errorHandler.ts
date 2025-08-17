@@ -9,7 +9,6 @@ export const errorHandler = (
 ): void => {
   const errorResponse = formatErrorResponse(error);
 
-  // Log error for debugging (in development)
   if (process.env.NODE_ENV === "development") {
     console.error("Error:", {
       message: error.message,
