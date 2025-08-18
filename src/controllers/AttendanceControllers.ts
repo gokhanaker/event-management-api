@@ -21,10 +21,6 @@ export const attendEvent = asyncHandler(
 
     const userId = new mongoose.Types.ObjectId(req.user.id);
 
-    logger.info(
-      `Attendance attempt by user ${req.user.id} for event ${eventId}`,
-    );
-
     const attendance = await attendEventService(
       userId,
       new mongoose.Types.ObjectId(eventId),
