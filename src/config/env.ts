@@ -22,6 +22,7 @@ const validateEnvironment = (): EnvironmentConfig => {
     (varName) => !process.env[varName],
   );
 
+  // Fail fast if any required environment variable is missing
   if (missingVars.length > 0) {
     throw new Error(
       `Missing required environment variables: ${missingVars.join(", ")}`,

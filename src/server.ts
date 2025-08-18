@@ -26,29 +26,29 @@ app.use(
   }),
 );
 
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+// Middleware to parse JSON and URL-encoded bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Middleware to log HTTP requests
 app.use(logHTTPRequest);
-app.use(rateLimiter);
-app.get("/health", healthCheck);
 
+// Middleware to rate limit requests
+app.use(rateLimiter);
+
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/attendance", attendanceRoutes);
 
+// Health check endpoint
+app.get("/health", healthCheck);
+
+// Error handling middleware
 app.use(errorHandler);
 
-app.use("*", (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: "Route not found",
-    timestamp: new Date().toISOString(),
-  });
-});
-
 const gracefulShutdown = (signal: string) => {
-  logger.info(`${signal} received. Starting graceful shutdown...`);
+  logger.info(`${signal} received. Starting shutdown...`);
   process.exit(0);
 };
 

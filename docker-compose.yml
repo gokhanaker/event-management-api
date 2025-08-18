@@ -7,8 +7,8 @@ services:
       - NODE_ENV=development
       - PORT=6000
       - MONGO_URI=mongodb://mongo:27017/event-management
-      - JWT_SECRET=dev-jwt-secret-key
-      - JWT_EXPIRATION_DURATION=24h
+      - JWT_SECRET=event-management-jwt-secret-key
+      - JWT_EXPIRATION_DURATION=4h
       - CORS_ORIGIN=http://localhost:3000
     depends_on:
       - mongo

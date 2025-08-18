@@ -5,9 +5,8 @@ import mongoose from "mongoose";
 const connectDB = async (): Promise<void> => {
   try {
     const options = {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
+      maxPoolSize: 10, // Maximum number of connections in the pool
+      socketTimeoutMS: 45000, // Timeout for socket connection
     };
 
     await mongoose.connect(config.MONGO_URI, options);
