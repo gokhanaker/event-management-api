@@ -3,6 +3,7 @@ import { successResponse } from "../utils/responseHandler";
 import { asyncHandler } from "../middleware/errorHandler";
 import { ValidationError } from "../utils/errorHandler";
 import { AuthenticatedRequest } from "../types/express";
+import logger from "../utils/logger";
 import { Response } from "express";
 import mongoose from "mongoose";
 
@@ -19,10 +20,17 @@ export const attendEvent = asyncHandler(
     }
 
     const userId = new mongoose.Types.ObjectId(req.user.id);
+
+    logger.info(
+      `Attendance attempt by user ${req.user.id} for event ${eventId}`,
+    );
+
     const attendance = await attendEventService(
       userId,
       new mongoose.Types.ObjectId(eventId),
     );
+
+    logger.info(`User ${req.user.id} successfully attended event ${eventId}`);
 
     successResponse(
       res,

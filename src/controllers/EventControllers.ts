@@ -13,6 +13,7 @@ import { successResponse } from "../utils/responseHandler";
 import { asyncHandler } from "../middleware/errorHandler";
 import { ValidationError } from "../utils/errorHandler";
 import { AuthenticatedRequest } from "../types/express";
+import logger from "../utils/logger";
 import { Response } from "express";
 import mongoose from "mongoose";
 
@@ -49,6 +50,7 @@ export const createEvent = asyncHandler(
       maxAttendees,
     );
 
+    logger.info(`Event created successfully: ${title} by user ${req.user.id}`);
     successResponse(res, event, "Event created successfully", 201);
   },
 );
@@ -73,6 +75,9 @@ export const getEvents = asyncHandler(
       endDate as string,
     );
 
+    logger.info(
+      `Events retrieved successfully: ${filteredEvents.length} events found`,
+    );
     successResponse(
       res,
       { events: filteredEvents },
@@ -90,6 +95,7 @@ export const getEvent = asyncHandler(
 
     const event = await getEventByIdService(id as string);
 
+    logger.info(`Event retrieved successfully: ${id}`);
     successResponse(res, event, "Event retrieved successfully");
   },
 );
@@ -123,6 +129,7 @@ export const updateEvent = asyncHandler(
       userRole,
     );
 
+    logger.info(`Event updated successfully: ${id} by user ${req.user.id}`);
     successResponse(res, event, "Event updated successfully");
   },
 );
@@ -144,6 +151,7 @@ export const deleteEvent = asyncHandler(
 
     const event = await deleteEventByIdService(id, userId, userRole);
 
+    logger.info(`Event deleted successfully: ${id} by user ${req.user.id}`);
     successResponse(res, event, "Event deleted successfully");
   },
 );

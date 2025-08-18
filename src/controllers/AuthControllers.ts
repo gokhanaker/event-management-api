@@ -4,6 +4,7 @@ import { registerUserSchema } from "../validation/AuthValidation";
 import { successResponse } from "../utils/responseHandler";
 import { asyncHandler } from "../middleware/errorHandler";
 import { ValidationError } from "../utils/errorHandler";
+import logger from "../utils/logger";
 import { Response } from "express";
 
 export const registerUser = asyncHandler(
@@ -21,6 +22,8 @@ export const registerUser = asyncHandler(
     const { username, email, password, role } = req.body;
 
     const token = await registerUserService(password, username, email, role);
+
+    logger.info(`User registered successfully: ${email}`);
     successResponse(res, { token }, "User registered successfully", 201);
   },
 );
@@ -33,5 +36,7 @@ export const login = asyncHandler(async (req: LoginRequest, res: Response) => {
   }
 
   const token = await loginService(email, password);
+
+  logger.info(`User logged in successfully: ${email}`);
   successResponse(res, { token }, "Login successful");
 });

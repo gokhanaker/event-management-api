@@ -1,5 +1,6 @@
 import { formatErrorResponse } from "../utils/errorHandler";
 import { Request, Response, NextFunction } from "express";
+import logger from "../utils/logger";
 
 export const errorHandler = (
   error: any,
@@ -10,7 +11,7 @@ export const errorHandler = (
   const errorResponse = formatErrorResponse(error);
 
   if (process.env.NODE_ENV === "development") {
-    console.error("Error:", {
+    logger.error("Error:", {
       message: error.message,
       stack: error.stack,
       url: req.url,
