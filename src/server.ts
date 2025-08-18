@@ -1,12 +1,12 @@
-import { healthCheck } from "./controllers/HealthController";
-import attendanceRoutes from "./routes/AttendanceRoutes";
-import { errorHandler } from "./middleware/errorHandler";
-import logger, { logHTTPRequest } from "./utils/logger";
-import { rateLimiter } from "./middleware/rateLimiter";
-import eventRoutes from "./routes/EventRoutes";
-import authRoutes from "./routes/AuthRoutes";
-import { config } from "./config/env";
-import connectDB from "./config/db";
+import { healthCheck } from "@/controllers/HealthController";
+import attendanceRoutes from "@/routes/AttendanceRoutes";
+import { errorHandler } from "@/middleware/errorHandler";
+import logger, { logHTTPRequest } from "@/utils/logger";
+import { rateLimiter } from "@/middleware/rateLimiter";
+import eventRoutes from "@/routes/EventRoutes";
+import authRoutes from "@/routes/AuthRoutes";
+import { config } from "@/config/env";
+import connectDB from "@/config/db";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
@@ -28,9 +28,9 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
 app.use(logHTTPRequest);
 app.use(rateLimiter);
-
 app.get("/health", healthCheck);
 
 app.use("/api/auth", authRoutes);

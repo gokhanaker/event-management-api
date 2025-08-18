@@ -11,6 +11,8 @@ export default [
       parserOptions: {
         ecmaVersion: 2021,
         sourceType: "module",
+        project: "./tsconfig.json",
+        tsconfigRootDir: import.meta.dirname,
       },
       globals: {
         console: "readonly",
@@ -30,9 +32,7 @@ export default [
         clearImmediate: "readonly",
       },
     },
-    plugins: {
-      "@typescript-eslint": tseslint,
-    },
+    plugins: { "@typescript-eslint": tseslint },
     rules: {
       ...tseslint.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": [
@@ -55,7 +55,5 @@ export default [
       "no-undef": "off",
     },
   },
-  {
-    ignores: ["dist/", "node_modules/", "*.js"],
-  },
+  { ignores: ["dist/", "node_modules/", "*.js"] },
 ];

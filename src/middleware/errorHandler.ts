@@ -1,6 +1,6 @@
-import { formatErrorResponse } from "../utils/errorHandler";
+import { formatErrorResponse } from "@/utils/errorHandler";
 import { Request, Response, NextFunction } from "express";
-import logger from "../utils/logger";
+import logger from "@/utils/logger";
 
 export const errorHandler = (
   error: any,

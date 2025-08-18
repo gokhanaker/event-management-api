@@ -1,9 +1,9 @@
-import Event, { IEvent } from "../models/Event";
-import { ERRORS } from "../constants/errors";
+import { NotFoundError, AuthorizationError } from "@/utils/errorHandler";
+import Event from "@/models/Event";
 import mongoose from "mongoose";
 
 export const createNewEventService = async (
-  organizer: mongoose.Types.ObjectId,
+  userId: mongoose.Types.ObjectId,
   userRole: string,
   title: string,
   description: string,
@@ -11,99 +11,115 @@ export const createNewEventService = async (
   location: string,
   category: string,
   maxAttendees: number,
-): Promise<IEvent> => {
-  if (userRole !== "organizer" && userRole !== "admin") {
-    throw new Error(ERRORS.FORBIDDEN);
-  }
-
+) => {
   const event = new Event({
     title,
     description,
     date,
     location,
-    organizer,
     category,
     maxAttendees,
+    organizer: userId,
   });
 
-  await event.save();
-  return event;
+  return await event.save();
 };
 
 export const getFilteredEventsService = async (
-  category: string | undefined,
-  location: string | undefined,
-  title: string | undefined,
-  startDate: string | undefined,
-  endDate: string | undefined,
-): Promise<IEvent[]> => {
-  const filters: any = {};
+  category?: string,
+  location?: string,
+  title?: string,
+  startDate?: string,
+  endDate?: string,
+) => {
+  const filter: any = {};
+
   if (category) {
-    filters.category = category;
+    filter.category = category;
   }
+
   if (location) {
-    filters.location = { $regex: location, $options: "i" };
-  } // i for case-insensitive
+    filter.location = { $regex: location, $options: "i" };
+  }
+
   if (title) {
-    filters.title = { $regex: title, $options: "i" };
+    filter.title = { $regex: title, $options: "i" };
   }
 
-  // Add date range filter
   if (startDate || endDate) {
-    filters.date = {};
+    filter.date = {};
     if (startDate) {
-      filters.date.$gte = new Date(startDate);
-    } // Greater than or equal to startDate
+      filter.date.$gte = new Date(startDate);
+    }
     if (endDate) {
-      filters.date.$lte = new Date(endDate);
-    } // Less than or equal to endDate
+      filter.date.$lte = new Date(endDate);
+    }
   }
 
-  return await Event.find(filters);
+  return await Event.find(filter).populate("organizer", "username email");
 };
 
-export const getEventByIdService = async (
-  id: string,
-): Promise<IEvent | null> => {
-  return await Event.findById(id);
+export const getEventByIdService = async (eventId: string) => {
+  const event = await Event.findById(eventId).populate(
+    "organizer",
+    "username email",
+  );
+
+  if (!event) {
+    throw new NotFoundError("Event not found");
+  }
+
+  return event;
 };
 
 export const updateEventByIdService = async (
-  id: string,
-  event: IEvent,
+  eventId: string,
+  updateData: any,
   userId: mongoose.Types.ObjectId,
   userRole: string,
-): Promise<IEvent | null> => {
-  const eventFromDb = await Event.findById(id);
-  if (!eventFromDb) {
-    throw new Error(ERRORS.EVENT_NOT_FOUND);
+) => {
+  const event = await Event.findById(eventId);
+
+  if (!event) {
+    throw new NotFoundError("Event not found");
   }
 
-  if (!eventFromDb.organizer.equals(userId) && userRole !== "admin") {
-    throw new Error(ERRORS.FORBIDDEN);
+  if (
+    userRole !== "admin" &&
+    event.organizer.toString() !== userId.toString()
+  ) {
+    throw new AuthorizationError("You can only update your own events");
   }
 
-  return await Event.findByIdAndUpdate(
-    id,
-    { $set: event }, // Only update the provided fields
-    { new: true }, // Return the updated document
-  );
+  const updatedEvent = await Event.findByIdAndUpdate(eventId, updateData, {
+    new: true,
+  }).populate("organizer", "username email");
+
+  return updatedEvent;
 };
 
 export const deleteEventByIdService = async (
-  id: string,
+  eventId: string,
   userId: mongoose.Types.ObjectId,
   userRole: string,
-): Promise<IEvent | null> => {
-  const event = await Event.findById(id);
+) => {
+  const event = await Event.findById(eventId);
+
   if (!event) {
-    throw new Error(ERRORS.EVENT_NOT_FOUND);
+    throw new NotFoundError("Event not found");
   }
 
-  if (!event.organizer.equals(userId) && userRole !== "admin") {
-    throw new Error(ERRORS.FORBIDDEN);
+  if (
+    userRole !== "admin" &&
+    event.organizer.toString() !== userId.toString()
+  ) {
+    throw new AuthorizationError("You can only delete your own events");
   }
 
-  const deletedEvent = await Event.findByIdAndDelete(id);
+  const deletedEvent = await Event.findByIdAndDelete(eventId).populate(
+    "organizer",
+    "username email",
+  );
+
   return deletedEvent;
 };

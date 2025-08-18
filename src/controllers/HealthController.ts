@@ -1,7 +1,7 @@
-import { successResponse } from "../utils/responseHandler";
-import { asyncHandler } from "../middleware/errorHandler";
+import { successResponse } from "@/utils/responseHandler";
+import { asyncHandler } from "@/middleware/errorHandler";
 import { Request, Response } from "express";
-import logger from "../utils/logger";
+import logger from "@/utils/logger";
 import mongoose from "mongoose";
 
 export const healthCheck = asyncHandler(async (req: Request, res: Response) => {

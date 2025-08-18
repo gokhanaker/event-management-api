@@ -1,19 +1,34 @@
 import {
   createEvent,
-  getEvent,
   getEvents,
+  getEvent,
   updateEvent,
   deleteEvent,
-} from "../controllers/EventControllers";
-import { authenticateJWT } from "../middleware/authMiddleware";
-import express from "express";
+} from "@/controllers/EventControllers";
+import { authenticateJWT, authorizeRoles } from "@/middleware/authMiddleware";
+import { Router } from "express";
 
-const router = express.Router();
+const router = Router();
 
-router.post("/", authenticateJWT, createEvent);
+router.post(
+  "/",
+  authenticateJWT,
+  authorizeRoles("admin", "organizer"),
+  createEvent,
+);
 router.get("/", authenticateJWT, getEvents);
-router.get("/:id", authenticateJWT, getEvent as express.RequestHandler);
-router.put("/:id", authenticateJWT, updateEvent as express.RequestHandler);
-router.delete("/:id", authenticateJWT, deleteEvent as express.RequestHandler);
+router.get("/:id", authenticateJWT, getEvent);
+router.put(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles("admin", "organizer"),
+  updateEvent,
+);
+router.delete(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles("admin", "organizer"),
+  deleteEvent,
+);
 
 export default router;

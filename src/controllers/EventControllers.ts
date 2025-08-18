@@ -4,16 +4,16 @@ import {
   getFilteredEventsService,
   deleteEventByIdService,
   updateEventByIdService,
-} from "../service/EventService";
+} from "@/service/EventService";
 import {
   createOrUpdateEventSchema,
   filterEventsSchema,
-} from "../validation/EventValidation";
-import { successResponse } from "../utils/responseHandler";
-import { asyncHandler } from "../middleware/errorHandler";
-import { ValidationError } from "../utils/errorHandler";
-import { AuthenticatedRequest } from "../types/express";
-import logger from "../utils/logger";
+} from "@/validation/EventValidation";
+import { successResponse } from "@/utils/responseHandler";
+import { asyncHandler } from "@/middleware/errorHandler";
+import { ValidationError } from "@/utils/errorHandler";
+import { AuthenticatedRequest } from "@/types/express";
+import logger from "@/utils/logger";
 import { Response } from "express";
 import mongoose from "mongoose";
 

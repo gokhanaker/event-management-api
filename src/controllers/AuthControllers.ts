@@ -1,10 +1,10 @@
-import { loginService, registerUserService } from "../service/AuthService";
-import { RegisterUserRequest, LoginRequest } from "../types/express";
-import { registerUserSchema } from "../validation/AuthValidation";
-import { successResponse } from "../utils/responseHandler";
-import { asyncHandler } from "../middleware/errorHandler";
-import { ValidationError } from "../utils/errorHandler";
-import logger from "../utils/logger";
+import { loginService, registerUserService } from "@/service/AuthService";
+import { RegisterUserRequest, LoginRequest } from "@/types/express";
+import { registerUserSchema } from "@/validation/AuthValidation";
+import { successResponse } from "@/utils/responseHandler";
+import { asyncHandler } from "@/middleware/errorHandler";
+import { ValidationError } from "@/utils/errorHandler";
+import logger from "@/utils/logger";
 import { Response } from "express";
 
 export const registerUser = asyncHandler(

@@ -1,35 +1,30 @@
-import Attendance, { IAttendance } from "../models/Attendance";
-import { ERRORS } from "../constants/errors";
-import Event from "../models/Event";
+import { ConflictError, NotFoundError } from "@/utils/errorHandler";
+import Attendance from "@/models/Attendance";
+import Event from "@/models/Event";
 import mongoose from "mongoose";
 
 export const attendEventService = async (
   userId: mongoose.Types.ObjectId,
   eventId: mongoose.Types.ObjectId,
-): Promise<IAttendance> => {
+) => {
   const event = await Event.findById(eventId);
+
   if (!event) {
-    throw new Error(ERRORS.EVENT_NOT_FOUND);
+    throw new NotFoundError("Event not found");
   }
 
   const existingAttendance = await Attendance.findOne({
-    userId,
-    eventId,
+    user: userId,
+    event: eventId,
   });
 
   if (existingAttendance) {
-    throw new Error(ERRORS.USER_ALREADY_ATTENDING);
-  }
-
-  // Check if the event has reached its max attendees
-  const currentAttendees = await Attendance.countDocuments({ event: eventId });
-  if (currentAttendees >= event.maxAttendees) {
-    throw new Error(ERRORS.EVENT_FULL);
+    throw new ConflictError("User is already registered for this event");
   }
 
   const attendance = new Attendance({
-    userId,
-    eventId,
+    user: userId,
+    event: eventId,
   });
 
   return await attendance.save();

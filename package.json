@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn src/server.ts",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn src/server.ts",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "clean": "rimraf dist",
@@ -35,6 +35,7 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.3",
+    "tsconfig-paths": "^4.2.0",
     "winston": "^3.17.0"
   },
   "devDependencies": {

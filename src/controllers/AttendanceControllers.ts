@@ -1,9 +1,9 @@
-import { attendEventService } from "../service/AttendanceService";
-import { successResponse } from "../utils/responseHandler";
-import { asyncHandler } from "../middleware/errorHandler";
-import { ValidationError } from "../utils/errorHandler";
-import { AuthenticatedRequest } from "../types/express";
-import logger from "../utils/logger";
+import { attendEventService } from "@/service/AttendanceService";
+import { successResponse } from "@/utils/responseHandler";
+import { asyncHandler } from "@/middleware/errorHandler";
+import { ValidationError } from "@/utils/errorHandler";
+import { AuthenticatedRequest } from "@/types/express";
+import logger from "@/utils/logger";
 import { Response } from "express";
 import mongoose from "mongoose";
 

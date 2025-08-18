@@ -1,4 +1,4 @@
-import { ApiResponse } from "../types/express";
+import { ApiResponse } from "@/types/express";
 import { Response } from "express";
 
 export const successResponse = <T>(

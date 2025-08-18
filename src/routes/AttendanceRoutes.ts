@@ -1,8 +1,8 @@
-import { attendEvent } from "../controllers/AttendanceControllers";
-import { authenticateJWT } from "../middleware/authMiddleware";
-import express from "express";
+import { attendEvent } from "@/controllers/AttendanceControllers";
+import { authenticateJWT } from "@/middleware/authMiddleware";
+import { Router } from "express";
 
-const router = express.Router();
+const router = Router();
 
 router.post("/:eventId", authenticateJWT, attendEvent);
 
